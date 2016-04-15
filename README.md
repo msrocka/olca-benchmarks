@@ -43,4 +43,59 @@ er angegeben werden kann. Es gibt für jeden Fluss genau eine Referenzgröße. J
 physikalische Größe hat genau eine Einheitengruppe die wiederum genau eine 
 Referenzeinheit hat. 
 
+In einem Exchange werden zu den Mengenangaben und Formeln auch die Einheit und
+die physikalische Größe (genauer die Referenz zum Umrechnungsfaktor zu der
+physikalischen Referenzgröße für den Fluss: `FlowPropertyFactor`) gespeichert.
+
+Die `ConversionTable` liefert für eine Datenbank effizient die 
+Umrechnungsfaktoren in die jeweiligen Referenzgrößen. In der Berechnung und in 
+den Ergebnissanzeigen werden Mengen von Flüssen immer in der Referenzgröße und 
+deren Einheit angegeben. Wichtig ist allerdings, das der Konvertierungsfaktor 
+erst nach der Auswertung von Formeln auf eine Mengenangaben angewendet wird.
+
 ## Index der Technologie-Matrix
+In der Technologie-Matrix werden die Produkt- und Abfallflüsse eines 
+Produktsystems auf Zeilen und Spalten abgebildet. Bisher wurde dafür das
+Paar aus Prozess- und Fluss-ID verwendet, um eine Zeile/Spalte in dieser
+Matrix eindeutig zu identifiziern:
+
+```java
+    LongPair processProduct = LongPair.of(processId, productId);
+```
+
+Genauso wurden auch Inputprodukte identifiziert und zum Aufbau der Matrizen für
+die Berechnung verwendet. In Produktsystemen wurde dann ein Prozesslink mit den
+folgenden Attributen gespeichert:
+
+```java
+    puplic class ProcessLink {
+        public long providerId;
+        public long recipientId;
+        public long flowId;
+    }
+```
+
+Will man aber in einem Prozess  Inputprodukte (bzw. Abfalloutputs) von 
+unterschiedlichen Providern im System haben, reicht diese Information nicht mehr
+aus, da man nicht weiß, welcher Input (bzw. Output) mit Menge, Einheit, etc. 
+zu diesem Link gehört.
+
+### Verwenden von Exchange-IDs
+Eine Alternative dieses Problem zu lösen ist die Verwendung von Exchange-IDs
+zur Referenzierung von Produkten und Abfällen. Ein Prozesslink könnte in 
+openLCA 2.0 im einfachsten Fall so aussehen:
+
+```java
+    puplic class ProcessLink {
+        public long inputID;
+        public long outputID;
+    }
+```
+
+(Gegebenenfalls können noch Prozess- und Fluss-IDs hinzugefügt werden, um Daten
+für die Visualisierungen/Editoren effizienter laden zu können.)
+
+#### Verlinken eines Produktsystems
+
+
+
