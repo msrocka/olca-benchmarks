@@ -19,7 +19,7 @@ import org.openlca.core.matrix.cache.FlowTypeTable;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-public class ExchangeTableScan {
+public class ExchangeTableJoin {
 
 	private IDatabase db = setUp();
 
@@ -40,7 +40,7 @@ public class ExchangeTableScan {
 		String query = "SELECT f_owner, f_flow, resulting_amount_value " +
 				"FROM tbl_exchanges";
 		NativeSql.on(db).query(query, r -> {
-			long flowId = r.getLong("f_flow");
+			long flowId = r.getLong(1);
 			flowTypes.getType(flowId);
 			return true;
 		});
@@ -57,7 +57,7 @@ public class ExchangeTableScan {
 
 	public static void main(String[] args) throws Exception {
 		Options opt = new OptionsBuilder()
-				.include(ExchangeTableScan.class.getName())
+				.include(ExchangeTableJoin.class.getName())
 				.warmupIterations(2)
 				.measurementIterations(5)
 				.forks(1)
