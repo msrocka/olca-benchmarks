@@ -9,6 +9,88 @@ import org.openlca.core.matrix.cache.FlowTypeTable;
 
 public class ExchangeTable {
     
+    private final IDatabase db;
+    private final boolean withUncertainty;
+    
+    private ConversionTable conversions;
+    private FlowTypeTable flowTypes;
+    private TLongObjectHashMap<ArrayList<PicoExchange>> cache;
+    
+    private ExchangeTable(IDatabase db, boolean withUncertainty) {
+        this.db = db;
+        this.withUncertainty = withUncertainty;
+        this.cache = new TLongObjectHashMap<>();
+        conversions = ConversionTable.create(db);
+        flowTypes = FlowTypeTable.create(db);
+    }
+    
+    public static ExchangeTable create(IDatabase db) {
+        return new ExchangeTable(db, false);
+    }
+    
+    public static ExchangeTable createWithUncertainty(IDatabase db) {
+        return new ExchangeTable(db, true);
+    }    
+    
+    public HashMap<Long, ArrayList<PicoExchange>> get(List<Long> processIDs) {
+        if (processIDs == null || processIDs.isEmpty())
+            return Collections.emptyMap();
+        HashMap<Long, ArrayList<PicoExchange>> result = new HashMap<>();
+        ArrayList<Long> querySet = new ArrayList<>();
+        for (Long processID : processIDs) {
+            ArrayList<PicoExchange> cachedList = cache.get(processID);
+            if (cachedList == null) {
+                querySet.add(processID);
+            } else {
+                result.put(processID, cachedList);
+            }
+        }
+        if (querySet.isEmpty())
+            return result;
+        fillCache(querySet);
+        for (Long processID : querySet) {
+            ArrayList<PicoExchange> cachedList = cache.get(processID);
+            if (cachedList == null) {
+                result.put(processID, Collections.emptyList());
+            } else {
+                result.put(processID, cachedList);
+            }
+        }                
+        return result;
+    }
+    
+    private void fillCache(List<Long> processIDs) {
+        StringBuilder listStr = new StringBuilder();
+        listStr.append('(');
+        for (int i = 0; i < processIDs.size(); i++) {
+            listStr.append(processIDs.get(i).toString());
+            if (i < (processIDs.size() - 1)) {
+                listStr.append(',')
+            }
+        }
+        listStr.append(')');
+        String sql = "SELECT id, f_owner, f_flow, f_default_provider, f_currency, "
+                + "f_flow_property_factor, f_unit, resulting_amount_value, cost_value, "
+                + "resulting_amount_formula, cost_formula, is_input, avoided_product "
+                + "from tbl_exchanges where f_owner in " + listStr.toString();
+        // TODO load uncertainties if required
+        try {
+            NativeSql.on(db).query(sql, r -> {
+	            try {
+		            PicoExchange e = read(r, conversions, flowTypes, withUncertainty);
+		            // TODO: find list and add exchange
+                    
+		            return true;
+	            } catch (Exception e) {
+		         	throw new RuntimeException("failed to read exchange", e);
+	            }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("failed to scan exchange table", e);
+        }
+    }
+    
+    
     /** 
      * Iterates over each exchange in the exchanges table. This function is used to
      * get the providers of product outputs and waste inputs (treatments) from the
