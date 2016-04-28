@@ -15,7 +15,7 @@ public class ExchangeTable {
      * database.     
      */
     public static void fullScan(IDatabase db, Consumer<PicoExchange> fn) {
-        String sql = "SELECT id, f_owner, f_flow, f_default_provider, f_currency "
+        String sql = "SELECT id, f_owner, f_flow, f_default_provider, f_currency, "
                 + "f_flow_property_factor, f_unit, resulting_amount_value, cost_value, "
                 + "resulting_amount_formula, cost_formula, is_input, avoided_product "
                 + "from tbl_exchanges";
@@ -59,7 +59,7 @@ public class ExchangeTable {
         long unitID = r.getLong(7);
         e.conversionFactor = conversions.getUnitFactor(unitID) 
                 / conversions.getPropertyFactor(propertyID);
-        e.amount = r.getDouble(8);
+        e.amount = r.getDouble(8) * e.conversionFactor;
         e.costValue = r.getDouble(9);
         
         e.amountFormula = r.getString(10);
