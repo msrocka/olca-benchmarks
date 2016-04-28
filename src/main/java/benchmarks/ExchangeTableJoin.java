@@ -7,7 +7,9 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -21,17 +23,17 @@ import org.openlca.core.matrix.cache.FlowTypeTable;
 @State(Scope.Benchmark)
 public class ExchangeTableJoin {
 
-	private IDatabase db = setUp();
+	private IDatabase db;
 
-	public IDatabase setUp()  {
-		try {
-			String dbPath = "C:\\Users\\Besitzer\\openLCA-data-1.4\\databases\\ecoinvent_3_2_apos";
-			db = new DerbyDatabase(new File(dbPath));
-			NativeSql.on(db).query("select count(*) from tbl_projects", r -> true);
-			return db;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	@Setup
+	public void setUp() {
+		String dbPath = "C:\\Users\\Besitzer\\openLCA-data-1.4\\databases\\ecoinvent_3_2_apos";
+		db = new DerbyDatabase(new File(dbPath));
+	}
+
+	@TearDown
+	public void tearDown() throws Exception {
+		db.close();
 	}
 
 	@Benchmark
