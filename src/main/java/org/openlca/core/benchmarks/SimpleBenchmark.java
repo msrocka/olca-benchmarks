@@ -1,4 +1,4 @@
-package benchmarks;
+package org.openlca.core.benchmarks;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;

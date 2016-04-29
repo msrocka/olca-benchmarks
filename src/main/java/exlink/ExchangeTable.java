@@ -8,8 +8,8 @@ import java.util.function.Consumer;
 
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.NativeSql;
-import org.openlca.core.matrix.cache.ConversionTable;
-import org.openlca.core.matrix.cache.FlowTypeTable;
+import org.openlca.core.matrix.dbtables.ConversionTable;
+import org.openlca.core.matrix.dbtables.FlowTypeTable;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
 

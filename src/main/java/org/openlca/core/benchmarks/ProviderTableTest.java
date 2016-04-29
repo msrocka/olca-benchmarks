@@ -1,7 +1,9 @@
-package benchmarks;
+package org.openlca.core.benchmarks;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+import exlink.ProviderTable;
+import exlink.ProviderTable_Join;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -15,15 +17,14 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.derby.DerbyDatabase;
-import org.openlca.core.matrix.cache.ConversionTable;
-import org.openlca.core.matrix.cache.FlowTypeTable;
+import org.openlca.core.model.ProcessType;
 
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-public class BaseTableTests {
- 
-    private IDatabase db;
+public class ProviderTableTest {
+
+	private IDatabase db;
 
 	@Setup
 	public void setUp() {
@@ -35,24 +36,24 @@ public class BaseTableTests {
 	public void tearDown() throws Exception {
 		db.close();
 	}
-    
-    @Benchmark
-    public void flowTypeTable() {
-        FlowTypeTable.create(db);        
-    }
-    
-    @Benchmark
-    public void conversionTable() {
-        ConversionTable.create(db);
-    } 
-    
-    public static void main(String[] args) throws Exception {
+
+	@Benchmark
+	public void withJoin() {
+		ProviderTable_Join.create(db, ProcessType.UNIT_PROCESS);
+	}
+
+	@Benchmark
+	public void withFullScan() {
+		ProviderTable.create(db, ProcessType.UNIT_PROCESS);
+	}
+
+	public static void main(String[] args) throws Exception {
 		Options opt = new OptionsBuilder()
-				.include(BaseTableTests.class.getName())
+				.include(ProviderTableTest.class.getName())
 				.warmupIterations(2)
-				.measurementIterations(10)
+				.measurementIterations(5)
 				.forks(1)
 				.build();
 		new Runner(opt).run();
-	}   
+	}
 }

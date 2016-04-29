@@ -1,7 +1,8 @@
-package benchmarks;
+package org.openlca.core.benchmarks;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+import exlink.ExchangeTable;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -16,12 +17,11 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.NativeSql;
 import org.openlca.core.database.derby.DerbyDatabase;
-import org.openlca.core.matrix.cache.FlowTypeTable;
 
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.SECONDS)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-public class ExchangeTableJoin {
+public class ExchangeTableScanTest {
 
 	private IDatabase db;
 
@@ -37,33 +37,26 @@ public class ExchangeTableJoin {
 	}
 
 	@Benchmark
-	public void scanWithFlowTypeTable() throws Exception {
-		FlowTypeTable flowTypes = FlowTypeTable.create(db);
+	public void scanWithQueryAndPass() throws Exception {
 		String query = "SELECT f_owner, f_flow, resulting_amount_value " +
 				"FROM tbl_exchanges";
-		NativeSql.on(db).query(query, r -> {
-			long flowId = r.getLong(1);
-			flowTypes.getType(flowId);
-			return true;
-		});
+		NativeSql.on(db).query(query, r -> true);
 	}
 
 	@Benchmark
-	public void scanWithJoin() throws Exception {
-		String query = "SELECT e.f_owner, e.f_flow, e.resulting_amount_value"
-				+ " FROM tbl_exchanges e INNER JOIN tbl_flows f ON e.f_flow = f.id"
-				+ " WHERE  (f.flow_type = 'PRODUCT_FLOW' AND e.is_input = 0)"
-				+ " OR (f.flow_type = 'WASTE_FLOW' AND e.is_input = 1)";
-		NativeSql.on(db).query(query, r -> true);
+	public void scanFull() {
+		ExchangeTable.fullScan(db, e -> {
+		});
 	}
 
 	public static void main(String[] args) throws Exception {
 		Options opt = new OptionsBuilder()
-				.include(ExchangeTableJoin.class.getName())
+				.include(ExchangeTableScanTest.class.getName())
 				.warmupIterations(2)
 				.measurementIterations(5)
 				.forks(1)
 				.build();
 		new Runner(opt).run();
 	}
+
 }
