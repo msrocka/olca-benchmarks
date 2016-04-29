@@ -1,5 +1,10 @@
 
 derby.log
-.idea
 target
-exlink.iml
+
+# IDE files
+.idea
+*.iml
+.settings
+.classpath
+.project
