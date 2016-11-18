@@ -16,7 +16,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.NativeSql;
 import org.openlca.core.database.derby.DerbyDatabase;
-import org.openlca.core.matrix.dbtables.FlowTypeTable;
+import org.openlca.core.matrix.cache.FlowTypeTable;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -43,7 +43,7 @@ public class ExchangeTableJoin {
 				"FROM tbl_exchanges";
 		NativeSql.on(db).query(query, r -> {
 			long flowId = r.getLong(1);
-			flowTypes.getType(flowId);
+			flowTypes.get(flowId);
 			return true;
 		});
 	}

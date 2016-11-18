@@ -7,7 +7,9 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -20,18 +22,23 @@ import org.openlca.core.database.derby.DerbyDatabase;
 @State(Scope.Benchmark)
 public class SqlRecordFieldAccess {
 
-	private IDatabase db = setUp();
-	private String query = "SELECT f_owner, f_flow, resulting_amount_value FROM tbl_exchanges";
+	private IDatabase db;
+	private String query = "SELECT f_owner, f_flow, resulting_amount_value " +
+			"FROM tbl_exchanges";
 
-	public IDatabase setUp() {
+	@Setup
+	public void setUp() {
 		try {
-			String dbPath = "C:\\Users\\Besitzer\\openLCA-data-1.4\\databases\\ecoinvent_3_2_apos";
-			db = new DerbyDatabase(new File(dbPath));
+			db = new DerbyDatabase(new File(Config.DB_PATH));
 			NativeSql.on(db).query("select count(*) from tbl_projects", r -> true);
-			return db;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@TearDown
+	public void tearDown() throws Exception {
+		db.close();
 	}
 
 	@Benchmark
