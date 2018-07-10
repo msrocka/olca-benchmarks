@@ -17,6 +17,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.CategoryDao;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.derby.DerbyDatabase;
+import org.openlca.core.model.ModelType;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -38,7 +39,9 @@ public class RootCategoriesBenchmark {
 	@Benchmark
 	public void getRootCategoriesFromDao() {
 		CategoryDao dao = new CategoryDao(db);
-		dao.getRootCategories();
+		for (ModelType type : ModelType.values()) {
+			dao.getRootCategories(type);
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
