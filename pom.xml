@@ -82,6 +82,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>org.openlca.core.benchmarks.${benchmark}</mainClass>
+                    <commandlineArgs>-Dfile.encoding=UTF-8</commandlineArgs>
                     <systemProperties>
                         <systemProperty>
                             <key>java.class.path</key>
