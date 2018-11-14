@@ -6,7 +6,7 @@
 
      <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <olca.version>1.7.1</olca.version>
+        <olca.version>1.7.4</olca.version>
         <benchmark>SimpleBenchmark</benchmark>
     </properties>
 
