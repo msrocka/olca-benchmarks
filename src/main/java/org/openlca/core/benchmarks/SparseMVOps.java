@@ -27,7 +27,7 @@ import org.openlca.core.matrix.format.MatrixConverter;
 import org.openlca.core.model.AllocationMethod;
 import org.openlca.core.model.ProductSystem;
 import org.openlca.julia.Julia;
-import org.openlca.julia.JuliaDenseSolver;
+import org.openlca.julia.JuliaSolver;
 
 /**
  * What is faster: a matrix-vector multiplication and column scaling using a
@@ -53,10 +53,10 @@ public class SparseMVOps {
 			"decf842e-048b-49a9-8f77-53ce63bf27d2");
 		Inventory inv = DataStructures.createInventory(
 			sys, AllocationMethod.NONE, MatrixCache.createLazy(db));
-		JuliaDenseSolver solver = new JuliaDenseSolver();
+		JuliaSolver solver = new JuliaSolver();
 		MatrixData data = inv.createMatrix(solver);
-		denseB = MatrixConverter.asDenseMatrix(data.enviMatrix);
-		sparseB = MatrixConverter.asHashMatrix(data.enviMatrix);
+		denseB = MatrixConverter.dense(data.enviMatrix);
+		sparseB = MatrixConverter.hashSparse(data.enviMatrix);
 		s = solver.solve(data.techMatrix, 0, 1.0);
 	}
 
@@ -67,14 +67,14 @@ public class SparseMVOps {
 
 	@Benchmark
 	public void denseMultiplication() throws Exception {
-		JuliaDenseSolver solver = new JuliaDenseSolver();
+		JuliaSolver solver = new JuliaSolver();
 		DenseMatrix b = denseB.copy();
 		solver.multiply(b, s);
 	}
 
 	@Benchmark
 	public void denseScaling() throws Exception {
-		JuliaDenseSolver solver = new JuliaDenseSolver();
+		JuliaSolver solver = new JuliaSolver();
 		DenseMatrix b = denseB.copy();
 		solver.scaleColumns(b, s);
 	}
