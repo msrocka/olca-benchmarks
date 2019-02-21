@@ -23,7 +23,7 @@ import org.openlca.core.matrix.Inventory;
 import org.openlca.core.matrix.MatrixData;
 import org.openlca.core.matrix.cache.MatrixCache;
 import org.openlca.core.matrix.format.DenseMatrix;
-import org.openlca.core.matrix.format.HashMatrix;
+import org.openlca.core.matrix.format.HashPointMatrix;
 import org.openlca.core.matrix.format.MatrixConverter;
 import org.openlca.core.model.AllocationMethod;
 import org.openlca.core.model.ProductSystem;
@@ -42,7 +42,7 @@ public class SparseMVOps {
 
 	private IDatabase db;
 	private DenseMatrix denseB;
-	private HashMatrix sparseB;
+	private HashPointMatrix sparseB;
 	private double[] s;
 
 	@Setup
@@ -85,13 +85,13 @@ public class SparseMVOps {
 
 	@Benchmark
 	public void sparseMultiplication() throws Exception {
-		HashMatrix b = sparseB.copy();
+		HashPointMatrix b = sparseB.copy();
 		b.scaleColumns(s);
 	}
 
 	@Benchmark
 	public void sparseScaling() throws Exception {
-		HashMatrix b = sparseB.copy();
+		HashPointMatrix b = sparseB.copy();
 		b.multiply(s);
 	}
 
