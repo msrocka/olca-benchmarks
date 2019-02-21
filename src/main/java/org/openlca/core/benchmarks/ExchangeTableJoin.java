@@ -16,7 +16,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.NativeSql;
 import org.openlca.core.database.derby.DerbyDatabase;
-import org.openlca.core.matrix.cache.FlowTypeTable;
+import org.openlca.core.matrix.cache.FlowTable;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
@@ -37,12 +37,12 @@ public class ExchangeTableJoin {
 
 	@Benchmark
 	public void scanWithFlowTypeTable() throws Exception {
-		FlowTypeTable flowTypes = FlowTypeTable.create(db);
+		FlowTable flowTypes = FlowTable.create(db);
 		String query = "SELECT f_owner, f_flow, resulting_amount_value " +
 				"FROM tbl_exchanges";
 		NativeSql.on(db).query(query, r -> {
 			long flowId = r.getLong(1);
-			flowTypes.get(flowId);
+			flowTypes.type(flowId);
 			return true;
 		});
 	}

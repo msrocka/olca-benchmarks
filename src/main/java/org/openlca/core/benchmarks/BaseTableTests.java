@@ -17,7 +17,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.derby.DerbyDatabase;
 import org.openlca.core.matrix.cache.ConversionTable;
-import org.openlca.core.matrix.cache.FlowTypeTable;
+import org.openlca.core.matrix.cache.FlowTable;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -38,7 +38,7 @@ public class BaseTableTests {
 
 	@Benchmark
 	public void flowTypeTable() {
-		FlowTypeTable.create(db);
+		FlowTable.create(db);
 	}
 
 	@Benchmark

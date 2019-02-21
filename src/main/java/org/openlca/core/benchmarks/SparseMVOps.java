@@ -1,6 +1,7 @@
 package org.openlca.core.benchmarks;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -51,8 +52,11 @@ public class SparseMVOps {
 		ProductSystemDao dao = new ProductSystemDao(db);
 		ProductSystem sys = dao.getForRefId(
 			"decf842e-048b-49a9-8f77-53ce63bf27d2");
-		Inventory inv = DataStructures.createInventory(
-			sys, AllocationMethod.NONE, MatrixCache.createLazy(db));
+		Inventory inv = DataStructures.inventory(
+			sys,
+			AllocationMethod.NONE,
+			MatrixCache.createLazy(db),
+			Collections.emptyMap());
 		JuliaSolver solver = new JuliaSolver();
 		MatrixData data = inv.createMatrix(solver);
 		denseB = MatrixConverter.dense(data.enviMatrix);

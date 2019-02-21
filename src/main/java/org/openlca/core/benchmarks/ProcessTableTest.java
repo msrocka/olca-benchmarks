@@ -15,7 +15,6 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.derby.DerbyDatabase;
-import org.openlca.core.matrix.cache.FlowTypeTable;
 import org.openlca.core.matrix.cache.ProcessTable;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -37,8 +36,7 @@ public class ProcessTableTest {
 
 	@Benchmark
 	public void processTable() {
-		FlowTypeTable flowTypes = FlowTypeTable.create(db);
-		ProcessTable.create(db, flowTypes);
+		ProcessTable.create(db);
 	}
 
 	public static void main(String[] args) throws Exception {
