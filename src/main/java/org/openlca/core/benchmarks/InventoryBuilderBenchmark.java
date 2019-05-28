@@ -21,7 +21,7 @@ import org.openlca.core.database.derby.DerbyDatabase;
 import org.openlca.core.math.CalculationSetup;
 import org.openlca.core.math.CalculationType;
 import org.openlca.core.math.DataStructures;
-import org.openlca.core.matrix.InventoryBuilder2;
+import org.openlca.core.matrix.InventoryBuilder;
 import org.openlca.core.matrix.InventoryConfig;
 import org.openlca.core.matrix.TechIndex;
 import org.openlca.core.matrix.cache.MatrixCache;
@@ -67,7 +67,7 @@ public class InventoryBuilderBenchmark {
 	public void newBuilder() throws Exception {
 		InventoryConfig conf = new InventoryConfig(db, techIndex);
 		conf.interpreter = DataStructures.interpreter(db, setup, techIndex);
-		new InventoryBuilder2(conf).build();
+		new InventoryBuilder(conf).build();
 	}
 
 	public static void main(String[] args) throws Exception {

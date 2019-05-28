@@ -18,14 +18,14 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.database.ProductSystemDao;
 import org.openlca.core.database.derby.DerbyDatabase;
+import org.openlca.core.math.CalculationSetup;
+import org.openlca.core.math.CalculationType;
 import org.openlca.core.math.DataStructures;
-import org.openlca.core.matrix.Inventory;
 import org.openlca.core.matrix.MatrixData;
 import org.openlca.core.matrix.cache.MatrixCache;
 import org.openlca.core.matrix.format.DenseMatrix;
 import org.openlca.core.matrix.format.HashPointMatrix;
 import org.openlca.core.matrix.format.MatrixConverter;
-import org.openlca.core.model.AllocationMethod;
 import org.openlca.core.model.ProductSystem;
 import org.openlca.julia.Julia;
 import org.openlca.julia.JuliaSolver;
@@ -51,14 +51,15 @@ public class SparseMVOps {
 		db = new DerbyDatabase(new File(Config.DB_PATH));
 		ProductSystemDao dao = new ProductSystemDao(db);
 		ProductSystem sys = dao.getForRefId(
-			"decf842e-048b-49a9-8f77-53ce63bf27d2");
-		Inventory inv = DataStructures.inventory(
-			sys,
-			AllocationMethod.NONE,
-			MatrixCache.createLazy(db),
-			Collections.emptyMap());
+				"decf842e-048b-49a9-8f77-53ce63bf27d2");
 		JuliaSolver solver = new JuliaSolver();
-		MatrixData data = inv.createMatrix(solver);
+		CalculationSetup setup = new CalculationSetup(
+				CalculationType.SIMPLE_CALCULATION, sys);
+		MatrixData data = DataStructures.matrixData(
+				setup,
+				solver,
+				MatrixCache.createLazy(db),
+				Collections.emptyMap());
 		denseB = MatrixConverter.dense(data.enviMatrix);
 		sparseB = MatrixConverter.hashSparse(data.enviMatrix);
 		s = solver.solve(data.techMatrix, 0, 1.0);
