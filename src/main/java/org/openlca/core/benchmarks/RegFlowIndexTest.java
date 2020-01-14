@@ -55,6 +55,11 @@ public class RegFlowIndexTest {
 		doTests(new J2LevelIndex());
 	}
 
+	@Benchmark
+	public void testUnregTLongIndex() {
+		doTests(new UnregTLongIndex());
+	}
+
 	private void doTests(Index index) {
 		for (int i = 0; i < SIZE; i++) {
 			boolean b = true;
@@ -289,4 +294,57 @@ class J2LevelIndex implements Index {
 		input.put(flowID, isInput);
 		return idx;
 	}
+}
+
+class UnregTLongIndex implements Index {
+
+	TLongIntHashMap index = new TLongIntHashMap(
+			Constants.DEFAULT_CAPACITY,
+			Constants.DEFAULT_LOAD_FACTOR,
+			-1L, // no entry key
+			-1); // no entry value
+
+	private final TLongByteHashMap input = new TLongByteHashMap(
+			Constants.DEFAULT_CAPACITY,
+			Constants.DEFAULT_LOAD_FACTOR,
+			-1L,
+			(byte) 0);
+
+	@Override
+	public int get(long flowID, long locationID) {
+		return index.get(flowID);
+	}
+
+	@Override
+	public boolean contains(long flowID, long locationID) {
+		int i = get(flowID, locationID);
+		return i >= 0;
+	}
+
+	@Override
+	public boolean isInput(long flowID, long locationID) {
+		byte b = input.get(flowID);
+		return b > 0;
+	}
+
+	@Override
+	public int putInput(long flowID, long locationID) {
+		return put(flowID, true);
+	}
+
+	@Override
+	public int putOutput(long flowID, long locationID) {
+		return put(flowID, false);
+	}
+
+	private int put(long flowID, boolean isInput) {
+		int idx = index.get(flowID);
+		if (idx >= 0)
+			return idx;
+		idx = index.size();
+		index.put(flowID, idx);
+		input.put(flowID, isInput ? (byte) 1 : 0);
+		return idx;
+	}
+
 }
