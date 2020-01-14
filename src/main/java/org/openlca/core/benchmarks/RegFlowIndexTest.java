@@ -19,6 +19,9 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.matrix.LongPair;
+import org.openlca.core.matrix.RegionalizedFlowIndex;
+import org.openlca.core.model.descriptors.FlowDescriptor;
+import org.openlca.core.model.descriptors.LocationDescriptor;
 
 import gnu.trove.impl.Constants;
 import gnu.trove.map.hash.TLongByteHashMap;
@@ -34,10 +37,38 @@ public class RegFlowIndexTest {
 	private List<Long> flowIDs;
 	private List<Long> locationIDs;
 
+	private List<FlowDescriptor> flows;
+	private List<LocationDescriptor> locations;
+
 	@Setup
 	public void setup() {
 		flowIDs = generateFlowIDs(SIZE);
 		locationIDs = generateLocationIDs(SIZE);
+
+		flows = new ArrayList<>();
+		locations = new ArrayList<>();
+		TLongObjectHashMap<FlowDescriptor> flowMap = new TLongObjectHashMap<>();
+		TLongObjectHashMap<LocationDescriptor> locMap = new TLongObjectHashMap<>();
+		for (int i = 0; i < SIZE; i++) {
+			long flowID = flowIDs.get(i);
+			FlowDescriptor flow = flowMap.get(flowID);
+			if (flow == null) {
+				flow = new FlowDescriptor();
+				flow.id = flowID;
+				flowMap.put(flowID, flow);
+			}
+
+			long locationID = locationIDs.get(i);
+			LocationDescriptor loc = locMap.get(locationID);
+			if (loc == null) {
+				loc = new LocationDescriptor();
+				loc.id = locationID;
+				locMap.put(locationID, loc);
+			}
+
+			flows.add(flow);
+			locations.add(loc);
+		}
 	}
 
 	@Benchmark
@@ -80,6 +111,27 @@ public class RegFlowIndexTest {
 				index.isInput(flowID, locationID);
 				index.contains(flowID, locationID);
 				index.get(flowID, locationID);
+			}
+		}
+	}
+
+	@Benchmark
+	public void testRegionalizedFlowIndex() {
+		RegionalizedFlowIndex index = new RegionalizedFlowIndex();
+		for (int i = 0; i < SIZE; i++) {
+			boolean b = true;
+			for (int j = 0; j < SIZE; j++) {
+				FlowDescriptor flow = flows.get(j);
+				LocationDescriptor loc = locations.get(j);
+				b = !b;
+				if (b) {
+					index.putInput(flow, loc);
+				} else {
+					index.putOutput(flow, loc);
+				}
+				index.isInput(flow);
+				index.contains(flow, loc);
+				index.of(flow, loc);
 			}
 		}
 	}
