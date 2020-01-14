@@ -6,7 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.PrimitiveIterator;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.matrix.LongPair;
 
 import gnu.trove.impl.Constants;
@@ -14,9 +25,51 @@ import gnu.trove.map.hash.TLongByteHashMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.SECONDS)
+@State(Scope.Benchmark)
 public class RegFlowIndexTest {
 
-	private static List<Long> generateFlowIDs(int size) {
+	private final int SIZE = 10_000;
+	private List<Long> flowIDs;
+	private List<Long> locationIDs;
+
+	@Setup
+	public void setup() {
+		flowIDs = generateFlowIDs(SIZE);
+		locationIDs = generateLocationIDs(SIZE);
+	}
+
+	@Benchmark
+	public void testLongPairIndex() {
+		doTests(new LongPairIndex());
+	}
+
+	@Benchmark
+	public void testTLong2LevelIndex() {
+		doTests(new TLong2LevelIndex());
+	}
+
+	private void doTests(Index index) {
+		for (int i = 0; i < SIZE; i++) {
+			boolean b = true;
+			for (int j = 0; j < SIZE; j++) {
+				long flowID = flowIDs.get(j);
+				long locationID = locationIDs.get(j);
+				b = !b;
+				if (b) {
+					index.putInput(flowID, locationID);
+				} else {
+					index.putOutput(flowID, locationID);
+				}
+				index.isInput(flowID, locationID);
+				index.contains(flowID, locationID);
+				index.get(flowID, locationID);
+			}
+		}
+	}
+
+	private List<Long> generateFlowIDs(int size) {
 		Random rand = new Random();
 		long next = rand.longs(10_000, 20_000)
 				.findFirst().getAsLong();
@@ -29,7 +82,7 @@ public class RegFlowIndexTest {
 		return longs;
 	}
 
-	private static List<Long> generateLocationIDs(int size) {
+	private List<Long> generateLocationIDs(int size) {
 		Random rand = new Random();
 		PrimitiveIterator.OfLong stream = rand.longs(
 				1000, 2000).iterator();
@@ -38,6 +91,16 @@ public class RegFlowIndexTest {
 			longs.add(stream.nextLong());
 		}
 		return longs;
+	}
+
+	public static void main(String[] args) throws Exception {
+		Options opt = new OptionsBuilder()
+				.include(RegFlowIndexTest.class.getName())
+				.warmupIterations(2)
+				.measurementIterations(5)
+				.forks(1)
+				.build();
+		new Runner(opt).run();
 	}
 
 }
