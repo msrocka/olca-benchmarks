@@ -1,7 +1,7 @@
 # olca-benchmarks
-A project template for running micro-benchmarks of openLCA core functions. It
-uses [jmh](http://openjdk.java.net/projects/code-tools/jmh/) from the OpenJDK
-project with a pure Maven setup.
+This is a project template for running micro-benchmarks of openLCA core
+functions. It uses [jmh](http://openjdk.java.net/projects/code-tools/jmh/) from
+the OpenJDK project with a pure Maven setup.
 
 ## Usage
 Put your benchmark, e.g. `MyBenchmark`, in the `org.openlca.core.benchmark`
@@ -23,7 +23,7 @@ run MyBenchmark
 ### Sparse vs. dense matrix-vector functions
 Using a plain hash table based implementation in Java for matrix-vector
 operations can be much faster than calling into an optimized BLAS library
-(OpenBLAS 64bit; tests with an ecoinvent3.4 system):
+(OpenBLAS 64bit; tests with an ecoinvent 3.4 system):
 
 ```
 Benchmark                         Mode  Cnt  Score   Error  Units

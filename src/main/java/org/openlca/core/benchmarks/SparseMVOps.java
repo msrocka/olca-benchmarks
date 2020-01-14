@@ -22,7 +22,6 @@ import org.openlca.core.math.CalculationSetup;
 import org.openlca.core.math.CalculationType;
 import org.openlca.core.math.DataStructures;
 import org.openlca.core.matrix.MatrixData;
-import org.openlca.core.matrix.cache.MatrixCache;
 import org.openlca.core.matrix.format.DenseMatrix;
 import org.openlca.core.matrix.format.HashPointMatrix;
 import org.openlca.core.matrix.format.MatrixConverter;
@@ -56,10 +55,7 @@ public class SparseMVOps {
 		CalculationSetup setup = new CalculationSetup(
 				CalculationType.SIMPLE_CALCULATION, sys);
 		MatrixData data = DataStructures.matrixData(
-				setup,
-				solver,
-				MatrixCache.createLazy(db),
-				Collections.emptyMap());
+				setup, solver, db, Collections.emptyMap());
 		denseB = MatrixConverter.dense(data.enviMatrix);
 		sparseB = MatrixConverter.hashSparse(data.enviMatrix);
 		s = solver.solve(data.techMatrix, 0, 1.0);

@@ -47,8 +47,12 @@ public class BaseTableTests {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Options opt = new OptionsBuilder().include(BaseTableTests.class.getName()).warmupIterations(2)
-				.measurementIterations(10).forks(1).build();
+		Options opt = new OptionsBuilder()
+			.include(BaseTableTests.class.getName())
+			.warmupIterations(2)
+			.measurementIterations(10)
+			.forks(1)
+			.build();
 		new Runner(opt).run();
 	}
 }

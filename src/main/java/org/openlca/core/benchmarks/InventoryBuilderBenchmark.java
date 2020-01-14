@@ -24,7 +24,6 @@ import org.openlca.core.math.DataStructures;
 import org.openlca.core.matrix.InventoryBuilder;
 import org.openlca.core.matrix.InventoryConfig;
 import org.openlca.core.matrix.TechIndex;
-import org.openlca.core.matrix.cache.MatrixCache;
 import org.openlca.core.matrix.solvers.DenseSolver;
 import org.openlca.core.model.ProductSystem;
 
@@ -57,10 +56,7 @@ public class InventoryBuilderBenchmark {
 	@Benchmark
 	public void oldBuilder() throws Exception {
 		DataStructures.matrixData(
-				setup,
-				new DenseSolver(),
-				MatrixCache.createLazy(db),
-				Collections.emptyMap());
+				setup, new DenseSolver(), db, Collections.emptyMap());
 	}
 
 	@Benchmark
