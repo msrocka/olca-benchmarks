@@ -23,6 +23,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openlca</groupId>
+            <artifactId>olca-geo</artifactId>
+            <version>${olca.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
             <version>1.22</version>

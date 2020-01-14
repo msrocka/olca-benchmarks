@@ -19,7 +19,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openlca.core.matrix.LongPair;
-import org.openlca.core.matrix.RegionalizedFlowIndex;
+import org.openlca.geo.RegFlowIndex;
 import org.openlca.core.model.descriptors.FlowDescriptor;
 import org.openlca.core.model.descriptors.LocationDescriptor;
 
@@ -117,7 +117,7 @@ public class RegFlowIndexTest {
 
 	@Benchmark
 	public void testRegionalizedFlowIndex() {
-		RegionalizedFlowIndex index = new RegionalizedFlowIndex();
+		RegFlowIndex index = new RegFlowIndex();
 		for (int i = 0; i < SIZE; i++) {
 			boolean b = true;
 			for (int j = 0; j < SIZE; j++) {
