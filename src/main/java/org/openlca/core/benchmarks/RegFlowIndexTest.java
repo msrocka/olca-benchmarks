@@ -18,8 +18,9 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openlca.core.matrix.FlowIndex2;
 import org.openlca.core.matrix.LongPair;
-import org.openlca.geo.RegFlowIndex;
+import org.openlca.core.matrix.RegFlowIndex;
 import org.openlca.core.model.descriptors.FlowDescriptor;
 import org.openlca.core.model.descriptors.LocationDescriptor;
 
@@ -130,6 +131,28 @@ public class RegFlowIndexTest {
 					index.putOutput(flow, loc);
 				}
 				index.isInput(flow);
+				index.contains(flow, loc);
+				index.of(flow, loc);
+			}
+		}
+	}
+
+	@Benchmark
+	public void testFlowIndex2() {
+		FlowIndex2 index = FlowIndex2.createRegionalized();
+		for (int i = 0; i < SIZE; i++) {
+			boolean b = true;
+			for (int j = 0; j < SIZE; j++) {
+				FlowDescriptor flow = flows.get(j);
+				LocationDescriptor loc = locations.get(j);
+				b = !b;
+				int idx;
+				if (b) {
+					idx = index.putInput(flow, loc);
+				} else {
+					idx = index.putOutput(flow, loc);
+				}
+				index.at(idx);
 				index.contains(flow, loc);
 				index.of(flow, loc);
 			}

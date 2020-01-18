@@ -56,7 +56,7 @@ public class InventoryBuilderBenchmark {
 	@Benchmark
 	public void oldBuilder() throws Exception {
 		DataStructures.matrixData(
-				setup, new DenseSolver(), db, Collections.emptyMap());
+				setup, db, Collections.emptyMap());
 	}
 
 	@Benchmark

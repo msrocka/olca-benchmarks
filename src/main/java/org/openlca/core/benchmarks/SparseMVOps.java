@@ -55,7 +55,7 @@ public class SparseMVOps {
 		CalculationSetup setup = new CalculationSetup(
 				CalculationType.SIMPLE_CALCULATION, sys);
 		MatrixData data = DataStructures.matrixData(
-				setup, solver, db, Collections.emptyMap());
+				setup, db, Collections.emptyMap());
 		denseB = MatrixConverter.dense(data.enviMatrix);
 		sparseB = MatrixConverter.hashSparse(data.enviMatrix);
 		s = solver.solve(data.techMatrix, 0, 1.0);
